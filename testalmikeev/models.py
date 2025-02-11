@@ -21,11 +21,17 @@ class GoogleTab(models.Model):
     updated_at = models.DateTimeField(verbose_name="Дата изменения", **NULLABLE)
     order_type = models.CharField(max_length=50, verbose_name='Тип продажи', **NULLABLE)
 
-    def __str__(self):
-        return self.nm_id
+    # def __str__(self):
+    #     return self.nm_id
 
     class Meta:
         verbose_name = "Продукт"
         verbose_name_plural = "Продукты"
 
 
+class FileCsv(models.Model):
+    file = models.FileField(upload_to='csv/%Y/%m/%d/', default=None, blank=True, null=True, verbose_name="CSV файл")
+
+    class Meta:
+        verbose_name = "Файл"
+        verbose_name_plural = "Файлы"

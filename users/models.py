@@ -8,7 +8,7 @@ NULLABLE = {"null": True, "blank": True}
 class User(AbstractUser):
     username = None
 
-    email = models.EmailField(max_length=255, verbose_name="Почта", **NULLABLE, db_index=True)
+    email = models.EmailField(max_length=255, verbose_name="Почта", unique=True)
 
     def __str__(self):
         return self.email
@@ -19,4 +19,3 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-

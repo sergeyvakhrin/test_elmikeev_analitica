@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from testalmikeev.models import GoogleTab, FileCsv
+from testalmikeev.models import GoogleTab, FileCsv, Report
 
 
 @admin.register(GoogleTab)
@@ -10,4 +10,9 @@ class GoogleTabAdmin(admin.ModelAdmin):
 
 @admin.register(FileCsv)
 class FileCsvAdmin(admin.ModelAdmin):
-    list_display = ['file']
+    list_display = ['id', 'file']
+
+
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ['id', 'nm_id', 'report']

@@ -1,0 +1,24 @@
+{% block content %}
+<div class="container">
+    <form class="row" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-6">
+                <div class="card card-body">
+                    <p class="card-text">Выбрать файл</p>
+                    <div class="card_body">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Загрузить</button>
+                    <p></p>
+                    <a class="btn btn-primary" href="{% url 'testalmikeev:report_csv' %}" role="button">Получить отчет на последний загруженный файл</a>
+                    </p>
+                </div>
+            </div>
+
+
+
+        </div>
+    </form>
+</div>
+{% endblock %}

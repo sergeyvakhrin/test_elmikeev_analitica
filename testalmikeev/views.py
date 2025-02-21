@@ -10,11 +10,17 @@ from django.shortcuts import render
 
 from testalmikeev.forms import ResumeForm
 from testalmikeev.models import FileCsv, GoogleTab, Report
-from testalmikeev.servises import get_path_last_file, load_file, db_in_to_data, get_unique_id, save_report
+from testalmikeev.servises import get_path_last_file, load_file, db_in_to_data, get_unique_id, save_report, \
+    createsuperuserone
+from users.models import User
 
 
 def home(request):
     """ Контроллер стартовой страницы """
+    users = User.objects.all().exists()
+    if not users:
+        createsuperuserone()
+
     if request.method == 'POST':
         form = ResumeForm(request.POST, request.FILES)
         if form.is_valid():

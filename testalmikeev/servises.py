@@ -7,6 +7,21 @@ from django.db import connection
 from django.db.models import Sum
 
 from testalmikeev.models import GoogleTab, FileCsv, Report
+from users.models import User
+
+
+def createsuperuserone():
+    """  """
+    user = User.objects.create(
+        email='admin@sky.pro',
+        first_name='Admin',
+        last_name='SkyPro',
+        is_staff=True,
+        is_superuser=True,
+        is_active=True,
+    )
+    user.set_password('1234')
+    user.save()
 
 
 def get_path_last_file():
@@ -29,7 +44,7 @@ def validate_line(line):
         index += 1
         if a == 2:
             a = 0
-            continue
+            continue                            # TODO: переписать весь этот страх
         if l == ',' and a == 1:
             data[index] = '.'
             continue

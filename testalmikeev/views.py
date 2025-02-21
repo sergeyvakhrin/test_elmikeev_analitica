@@ -41,7 +41,7 @@ def report_csv(request):
     else:
         form = ResumeForm
 
-    print("Загрузка данных из файла .csv")
+    print("Загрузка данных из файла .csv.", end=' ')
     start_time = datetime.datetime.now()
     path = get_path_last_file()
     if path:
@@ -51,23 +51,26 @@ def report_csv(request):
     else:
         return render(request, 'resume.html', {'form': form})
 
-    print("Очистка базы данных.")
+    print("Очистка базы данных.", end=' ')
     start_time = datetime.datetime.now()
     GoogleTab.objects.all().delete()
     Report.objects.all().delete()
     cur = connection.cursor()
     cur.execute(f'TRUNCATE TABLE testalmikeev_googletab RESTART IDENTITY CASCADE;')
     cur.execute(f'TRUNCATE TABLE testalmikeev_report RESTART IDENTITY CASCADE;')
-    print("Запись данных в базу.")
+    print("Запись данных в базу.", end=' ')
     db_in_to_data(list_dict_file)
     finish_time = datetime.datetime.now()
     print("Время выполнения:", finish_time - start_time)
 
-    print("Получаем список уникальных продуктов")
+    print("Получаем список уникальных продуктов.")
+    start_time = datetime.datetime.now()
     unique_id = get_unique_id()
     print(unique_id)
+    finish_time = datetime.datetime.now()
+    print("Время выполнения:", finish_time - start_time)
 
-    print("Сохранение отчета в .csv")
+    print("Сохранение отчета в .csv.", end=' ')
     start_time = datetime.datetime.now()
     save_report(unique_id)
     finish_time = datetime.datetime.now()

@@ -1,6 +1,7 @@
 import time
 from pathlib import Path
 import os
+import csv
 
 import psycopg2
 from django.db import connection
@@ -35,50 +36,20 @@ def get_path_last_file():
         return FILE_PATH
 
 
-def validate_line(line):
-    """ Валидация на дробные числа в поле total_price, Замена , на . """
-    a = 0
-    index = -1
-    data = list(line)
-    for l in data:
-        index += 1
-        if a == 2:
-            a = 0
-            continue                            # TODO: переписать весь этот страх
-        if l == ',' and a == 1:
-            data[index] = '.'
-            continue
-        if l == '"':
-            a += 1
-    line = ''.join(data)
-    line = line.replace('"', '')
-    return line
-
-
 def load_file(path):
     """ Загрузка данных из файла csv """
-    head = ['date', 'last_change_date', 'total_price', 'discount_percent', 'warehouse_name', 'oblast', 'nm_id',
-            'category', 'brand', 'is_cancel', 'cancel_dt', 'created_at', 'updated_at', 'order_type']
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, 'r', encoding='utf-8') as file:
         obj_list = []
-
-        for line in f:
-            if '"' in line:
-                line = validate_line(line)
-
-            obj = line.split(',')
-            if obj[0] == 'date':
-                continue
-
-            date, _ = obj[0].split(' ')
+        reader_dict = csv.DictReader(file, delimiter=',')
+        for obj in reader_dict:
+            obj['total_price'] = obj['total_price'].replace(',', '.')
+            date, _ = obj.get('date').split(' ')
             _, obj_month, _ = date.split('.')
             if obj_month != '01':
                 continue
-
-            obj[-1] = obj[-1][:-1]
-
-            obj_list.append(dict(zip(head, obj)))
+            obj_list.append(obj)
     return obj_list
+
 
 def db_in_to_data(obj_list):
     """ Заполняем базу данных """
@@ -106,14 +77,19 @@ def get_unique_id():
 
 def save_report(unique_id):
     """ Сохраняем результат в .csv и в базу """
-    with open('report.csv', 'w', encoding='utf-8') as file:
-        summa = 0
-        for obj in unique_id:
-            summa += obj[1]
-        file.write(f',{summa}\n')
-        file.write('Артикул,Сумма\n')
+    unique_id_for_csv = unique_id.copy()
+    summa = 0
+    for obj in unique_id_for_csv:
+        summa += obj[1]
+    unique_id_for_csv.insert(0, ('',summa))
+    unique_id_for_csv.insert(1,('Артикул', 'Сумма'))
+
+    with open('report.csv', 'w', encoding='utf-8', newline='') as file:
+        writer = csv.writer(file, delimiter=',')
+        writer.writerows(unique_id_for_csv)
+
+        print("Сохранение отчета базу данных.", end=' ')
         for_report_bulk = []
         for obj in unique_id:
-            file.write(f'{obj[0]},{obj[1]}\n')
             for_report_bulk.append(Report(nm_id=obj[0], report=obj[1]))
         Report.objects.bulk_create(for_report_bulk)
